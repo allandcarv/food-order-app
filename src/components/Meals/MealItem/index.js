@@ -1,3 +1,5 @@
+import MealItemForm from './MealItemForm';
+
 import classes from './styles.module.css';
 
 const MealItem = ({ description, name, price }) => {
@@ -10,7 +12,7 @@ const MealItem = ({ description, name, price }) => {
                 <div className={classes.price}>{ parsedPrice }</div>
             </div>
             <div>
-
+                <MealItemForm />
             </div>
         </li>
     )
