@@ -1,2 +1,5 @@
-const App = () => <h1>Let's get started</h1>
+import Header from './components/Layout/Header';
+
+const App = () => <Header />
+
 export default App;
