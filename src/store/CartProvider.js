@@ -8,13 +8,25 @@ const defaultCartState = {
 }
 
 const cartReducer = (state, action) => {
-    console.log(action);
     switch (action.type) {
         case 'ADD_CART_ITEM': {
-            const updatedItems = [ ...state.items, action.payload ];
+            let parsedItems;
+
             const updatedTotalAmount = state.totalAmount + action.payload.price * action.payload.amount;
+            
+            const indexOfItem = state.items.findIndex(item => item.id === action.payload.id);
+
+            if (indexOfItem > -1) {
+                parsedItems = [ ...state.items ];
+                const parsedItem = { ...state.items[indexOfItem] };
+                parsedItem.amount += action.payload.amount;
+                parsedItems[indexOfItem] = parsedItem;
+            } else {
+                parsedItems = [ ...state.items, { ...action.payload } ];
+            }
+
             return ({
-                items: [...updatedItems],
+                items: [ ...parsedItems ],
                 totalAmount: updatedTotalAmount
             });
         }
