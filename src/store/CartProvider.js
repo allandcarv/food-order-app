@@ -30,6 +30,35 @@ const cartReducer = (state, action) => {
                 totalAmount: updatedTotalAmount
             });
         }
+        case 'REMOVE_CART_ITEM': {
+            const indexOfItem = state.items.findIndex(item => item.id === action.payload.id );
+
+            if (indexOfItem > -1) { 
+                const totalAmount = state.totalAmount - state.items[indexOfItem].price;
+
+                const finalItems = state.items.reduce((final, current, index) => {
+                    if (index !== indexOfItem) {
+                        return [ ...final, { ...current } ];
+                    }
+
+                    const newAmount = current.amount - 1;
+
+                    if (newAmount) {
+                        return [ ...final, { ...current, amount: newAmount } ];
+                    } else {
+                        return [ ...final ];
+                    }
+                }, []);
+
+                return ({ 
+                    items: [ ...finalItems ],
+                    totalAmount,
+                })
+
+            } else {
+                return ({ ...state })
+            }
+        }
         default: {
             return state;
         }
@@ -40,10 +69,13 @@ const CartProvider = ({ children }) => {
     const [cartState, dispatchCartAction] = useReducer(cartReducer, defaultCartState);
 
     const addItemToCartHandler = ( item ) => {
-        dispatchCartAction({ type: 'ADD_CART_ITEM', payload: item })
+        dispatchCartAction({ type: 'ADD_CART_ITEM', payload: item });
     }
 
-    const removeItemFromCartHandler = ( id ) => {}
+    const removeItemFromCartHandler = ( id ) => {
+        dispatchCartAction({ type: 'REMOVE_CART_ITEM', payload: id });
+    }
+
     const cartContext = {
         items: cartState.items,
         totalAmount: cartState.totalAmount,
