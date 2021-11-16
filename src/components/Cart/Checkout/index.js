@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import classes from './styles.module.css';
 
 const isEmpty = value => !value.trim();
-const isFiveChars = value => value.trim().length === 5;
+const isFiveChars = value => value.trim().length > 4;
 
 const Checkout = (props) => {
   const [formInputsValidity, setFormInputsValidity] = useState({
@@ -44,7 +44,12 @@ const Checkout = (props) => {
       return;
     }
 
-    // Submit cart data
+    props.onConfirm({
+      name: enteredName,
+      street: enteredStreet,
+      city: enteredCity,
+      postalCode: enteredPostalCode
+    })
   };
 
   return (

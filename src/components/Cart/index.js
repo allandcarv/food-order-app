@@ -6,9 +6,12 @@ import CartContext from '../../store/cart-context';
 import Checkout from './Checkout';
 
 import classes from './styles.module.css';
+import { Fragment } from 'react';
 
 const Cart = ({ onClose }) => {
     const [isCheckout, setIsCheckout] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [didSubmit, setDidSubmit] = useState(false);
 
     const cartCtx = useContext(CartContext);
 
@@ -25,6 +28,22 @@ const Cart = ({ onClose }) => {
 
     const orderHandler = () => {
         setIsCheckout(true);
+    }
+
+    const submitOrderHandler = async userData => {
+        setIsSubmitting(true);
+
+        await fetch('https://food-app-59048-default-rtdb.firebaseio.com/orders.json', {
+            method: 'POST',
+            body: JSON.stringify({
+                user: userData,
+                orderedItem: cartCtx.items
+            })
+        });
+
+        setIsSubmitting(false);
+        setDidSubmit(true);
+        cartCtx.clearCart()
     }
 
     const cartItems = (
@@ -51,15 +70,27 @@ const Cart = ({ onClose }) => {
         </div>
     );
 
-    return (
-        <Modal onClose={onClose} >
+    const cartModalContent = (
+        <Fragment>
             {cartItems}
             <div className={classes.total}>
                 <span>Total Amount</span>
                 <span>{totalAmount}</span>
             </div>
-            {isCheckout && <Checkout onClose={onClose} />}
+            {isCheckout && <Checkout onConfirm={submitOrderHandler} onClose={onClose} />}
             {!isCheckout && modalActions}
+        </Fragment>
+    )
+
+    const isSubmittingModalContent = <p>Sending order data...</p>
+
+    const didSubmitModalContent = <p>Succesfully sent the order!</p>
+
+    return (
+        <Modal onClose={onClose} >
+          {!isSubmitting && !didSubmit && cartModalContent}
+          {isSubmitting && isSubmittingModalContent}
+          {!isSubmitting && didSubmit && didSubmitModalContent}
         </Modal>
     )
 }
